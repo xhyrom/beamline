@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": {
+      "item": "create:copper_sheet"
+    },
+    "T": {
+      "item": "create:transmitter"
+    },
+    "C": {
+      "item": "create:copper_casing"
+    },
+    "L": {
+      "item": "create:display_link"
+    }
+  },
+  "pattern": [
+    "STS",
+    "CLC",
+    "STS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_beamline:smart_display_link"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "block.create_beamline.smart_display_link": "Smart Display Link",
+  "itemGroup.create_beamline": "Create: Beamline",
+  "create_beamline.screen.smart_display_link.title": "Display Link",
+  "create_beamline.screen.smart_display_link.back_to_selection": "Back to Selection",
+  "create_beamline.screen.smart_display_link.name_tooltip.title": "Name for this Display Link",
+  "create_beamline.screen.smart_display_link.name_tooltip.display": "The name shown in Smart Display Link's selection",
+  "create_beamline.screen.smart_display_link_selection.title": "Select Display Link",
+  "create_beamline.screen.smart_display_link_selection.no_links": "No Targets Linked",
+
+  "create_beamline.smart_display_link.clear": "Cleared position selection",
+  "create_beamline.smart_display_link.set": "Targeted position selected",
+  "create_beamline.smart_display_link.invalid": "Link has no valid target, try placing it again",
+  "create_beamline.smart_display_link.dimension_mismatch": "Targeted position is in a different dimension",
+  "create_beamline.smart_display_link.already_selected": "This target is already selected",
+  "create_beamline.smart_display_link.too_far": "Targeted position is too far from here",
+  "create_beamline.smart_display_link.success": "Successfully bound to targeted position",
+  "create_beamline.smart_display_link.added_sources": "Successfully added %s new targets",
+  "create_beamline.smart_display_link.no_new_sources": "All selected targets are already linked",
+  "create_beamline.smart_display_link.no_selections": "Nothing selected to add as targets"
+}
