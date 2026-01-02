@@ -10,5 +10,4 @@ pluginManagement {
 rootProject.name = "beamline"
 
 include("common")
-include("fabric")
 include("neoforge")
