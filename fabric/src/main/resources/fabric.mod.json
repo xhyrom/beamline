@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "xhyrom"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/create-beamline",
+    "issues": "https://github.com/xhyrom/beamline/issues",
+    "sources": "https://github.com/xhyrom/beamline"
+  },
+  "license": "Apache-2.0",
+  "icon": "assets/${mod_id}/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.xhyrom.beamline.fabric.BeamlineModFabric"
+    ],
+    "client": [
+      "dev.xhyrom.beamline.fabric.client.BeamlineModFabricClient"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~${minecraft_version}",
+    "create": ">=${supported_create_versions}",
+    "architectury": ">=${architectury_version}",
+    "fabric-api": "*"
+  }
+}

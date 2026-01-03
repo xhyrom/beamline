@@ -1,16 +1,36 @@
+import net.fabricmc.loom.task.RemapJarTask
+
+plugins {
+    idea
+    id("com.github.johnrengelman.shadow")
+}
+
 architectury {
-    common("forge", "fabric")
     platformSetupLoomIde()
     forge()
 }
 
 val minecraftVersion: String = property("minecraft_version") as String
-val fabricLoaderVersion: String = property("fabric_loader_version") as String
 val forgeVersion: String = property("forge_version") as String
 val architecturyVersion: String = property("architectury_version") as String
 
+val common: Configuration by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+val shadowBundle: Configuration by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+val developmentForge: Configuration by configurations.getting
+
+configurations {
+    compileOnly.configure { extendsFrom(common) }
+    runtimeOnly.configure { extendsFrom(common) }
+    developmentForge.extendsFrom(common)
+}
+
 dependencies {
-    modImplementation("net.fabricmc:fabric-loader:${fabricLoaderVersion}")
     forge("net.minecraftforge:forge:${forgeVersion}")
 
     modApi("dev.architectury:architectury-forge:${architecturyVersion}")
@@ -24,4 +44,22 @@ dependencies {
     compileOnly("io.github.llamalad7:mixinextras-common:0.4.1")
     annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")
     implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
+
+    common(project(":common", configuration = "namedElements")) {
+        isTransitive = false
+    }
+    shadowBundle(project(":common", configuration = "transformProductionForge")) {
+        isTransitive = false
+    }
+}
+
+tasks.named<RemapJarTask>("remapJar") {
+    dependsOn(tasks.shadowJar)
+
+    inputFile.set(tasks.shadowJar.get().archiveFile)
+    archiveFileName = "${base.archivesName.get()}.jar"
+}
+
+tasks.build {
+    dependsOn(tasks.named("remapJar"))
 }

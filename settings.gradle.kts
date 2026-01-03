@@ -2,12 +2,14 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.wagyourtail.xyz/releases")
-        maven("https://maven.wagyourtail.xyz/snapshots")
+        maven("https://maven.fabricmc.net/")
+        maven("https://maven.architectury.dev/")
+        maven("https://maven.minecraftforge.net/")
     }
 }
 
 rootProject.name = "beamline"
 
 include("common")
-include("neoforge")
+include("fabric")
+include("forge")

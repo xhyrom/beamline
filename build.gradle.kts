@@ -1,14 +1,18 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
 
 plugins {
     id("java")
     id("idea")
-    id("xyz.wagyourtail.unimined") version "1.4.2-SNAPSHOT" apply false
+    id("architectury-plugin") version "3.4-SNAPSHOT"
+    id("dev.architectury.loom") version "1.7.+" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
 }
 
 val baseName: String = property("archives_base_name") as String
+val minecraftVersion: String = property("minecraft_version") as String
 val supportedMinecraftVersions: String = property("supported_minecraft_versions") as String
+val supportedCreateVersions: String = property("supported_create_versions") as String
 val modId: String = property("mod_id") as String
 val modVersion: String = property("mod_version") as String
 val modName: String = property("mod_name") as String
@@ -18,7 +22,8 @@ version = modVersion
 group = "dev.xhyrom"
 
 subprojects {
-    apply(plugin = "java")
+    apply(plugin = "dev.architectury.loom")
+    apply(plugin = "architectury-plugin")
     apply(plugin = "com.github.johnrengelman.shadow")
 
     project.version = rootProject.version
@@ -26,17 +31,24 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven("https://maven.createmod.net")
-        maven("https://maven.ithundxr.dev/snapshots")
+        maven("https://maven.createmod.net") // Create Forge, Ponder, Flywheel
+        maven("https://maven.ithundxr.dev/mirror") // Create Forge
     }
 
+    val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
+
     dependencies {
+        "minecraft"("net.minecraft:minecraft:${minecraftVersion}")
+        "mappings"(
+            loom.officialMojangMappings()
+        )
+
         compileOnly("org.projectlombok:lombok:1.18.42")
         annotationProcessor("org.projectlombok:lombok:1.18.42")
     }
 
     base {
-        archivesName.set("${baseName}_${name}-${modVersion}+${supportedMinecraftVersions}")
+        archivesName.set("${baseName}_${name}-${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}")
     }
 
     tasks.processResources {
@@ -45,20 +57,16 @@ subprojects {
         inputs.property("mod_description", modDescription)
         inputs.property("mod_id", modId)
         inputs.property("mod_version", modVersion)
+        inputs.property("minecraft_version", minecraftVersion)
+        inputs.property("architectury_version", rootProject.property("architectury_version"))
+        inputs.property("supported_create_versions", supportedCreateVersions)
 
-        filesMatching(listOf("META-INF/neoforge.mods.toml", "fabric.mod.json", "${modId}.*.mixins.json", "${modId}.mixins.json")) {
+        filesMatching(listOf("META-INF/mods.toml", "fabric.mod.json", "${modId}.*.mixins.json", "${modId}.mixins.json")) {
             expand(inputs.properties)
         }
     }
 
     if (name != "common") {
-        sourceSets.main {
-            output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
-            resources {
-                srcDirs(project(":common").sourceSets["main"].resources)
-            }
-        }
-
         tasks.named<ShadowJar>("shadowJar") {
             configurations = listOf(project.configurations.getByName("shadowBundle"))
             archiveFileName = "${base.archivesName.get()}-all.jar"
@@ -75,9 +83,9 @@ subprojects {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
 
-        toolchain.languageVersion = JavaLanguageVersion.of(21)
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
 }
