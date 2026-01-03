@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".github/icon.png" width="192" height="192" alt="logo">
+  <img src=".github/assets/icon.png" width="192" height="192" alt="logo">
   <h1>Create Beamline</h1>
 </div>
 
@@ -13,4 +13,15 @@
 
 </div>
 
-**Create Beamline** is an addon mod for Beamline that expands Create's display link system with multiplexing.
+**Create Beamline** is an addon mod for Create that expands its display link system with multiplexing.
+
+## What does it do?
+
+Create Beamline introduces a new type of Display Link called the **Smart Display Link**.
+
+It allows multiple sources and targets to be connected and managed through a single block, reducing the need for placing Display Links on every side of a block and making complex setups cleaner and easier to maintain.
+
+<div align="center" style="display: flex;">
+    <img src=".github/assets/display_link_selection.png" height="192" alt="display link selection">
+    <img src=".github/assets/display_link.png" height="192" alt="display link">
+</div>
