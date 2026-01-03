@@ -1,9 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
+import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 
 plugins {
     id("java")
     id("idea")
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
     id("architectury-plugin") version "3.4-SNAPSHOT"
     id("dev.architectury.loom") version "1.7.+" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
@@ -70,11 +73,6 @@ subprojects {
         tasks.named<ShadowJar>("shadowJar") {
             configurations = listOf(project.configurations.getByName("shadowBundle"))
             archiveFileName = "${base.archivesName.get()}-all.jar"
-            doLast {
-                configurations.forEach {
-                    println("Copying dependencies into mod: ${it.files}")
-                }
-            }
         }
     }
 
@@ -87,5 +85,132 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_17
 
         toolchain.languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+publishMods {
+    type = STABLE
+    changelog = getLatestChangelog()
+    version = "${modVersion}+mc-${supportedMinecraftVersions}-create${supportedCreateVersions}"
+
+    val curseforgeToken = providers.gradleProperty("curseforge.token")
+        .orElse(providers.environmentVariable("CURSEFORGE_TOKEN"))
+
+    val modrinthToken = providers.gradleProperty("modrinth.token")
+        .orElse(providers.environmentVariable("MODRINTH_TOKEN"))
+
+    val cfOptions = curseforgeOptions {
+        accessToken.set(curseforgeToken)
+        projectId.set("1419347")
+        minecraftVersions.add(supportedMinecraftVersions)
+    }
+
+    val mrOptions = modrinthOptions {
+        accessToken.set(modrinthToken)
+        projectId.set("ZmrUepY5")
+        minecraftVersions.add(supportedMinecraftVersions)
+    }
+
+    curseforge("curseforgeForge") {
+        from(cfOptions)
+
+        val proj = project(":forge")
+        val remapJarProvider = proj.provider {
+            proj.tasks.named<RemapJarTask>("remapJar")
+                .flatMap { it.archiveFile }
+        }.flatMap { it }
+
+        file.set(remapJarProvider)
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+
+        modLoaders.add("forge")
+
+        requires("create")
+        requires("architectury-api")
+    }
+
+    curseforge("curseforgeFabric") {
+        from(cfOptions)
+
+        val proj = project(":fabric")
+        val remapJarProvider = proj.provider {
+            proj.tasks.named<RemapJarTask>("remapJar")
+                .flatMap { it.archiveFile }
+        }.flatMap { it }
+
+        file.set(remapJarProvider)
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+
+        modLoaders.add("fabric")
+        modLoaders.add("quilt")
+
+        requires("fabric-api")
+        requires("create")
+        requires("architectury-api")
+    }
+
+    modrinth("modrinthFabric") {
+        from(mrOptions)
+
+        val proj = project(":fabric")
+        val remapJarProvider = proj.provider {
+            proj.tasks.named<RemapJarTask>("remapJar")
+                .flatMap { it.archiveFile }
+        }.flatMap { it }
+
+        file.set(remapJarProvider)
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+
+        modLoaders.add("fabric")
+        modLoaders.add("quilt")
+
+        requires("fabric-api")
+        requires("create")
+        requires("architectury-api")
+    }
+
+    modrinth("modrinthForge") {
+        from(mrOptions)
+
+        val proj = project(":forge")
+        val remapJarProvider = proj.provider {
+            proj.tasks.named<RemapJarTask>("remapJar")
+                .flatMap { it.archiveFile }
+        }.flatMap { it }
+
+        file.set(remapJarProvider)
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+
+        modLoaders.add("forge")
+
+        requires("create")
+        requires("architectury-api")
+    }
+}
+
+fun getLatestChangelog(): String {
+    val lines = rootProject.rootDir.resolve("CHANGELOG.md").readLines()
+    val changelogLines = mutableListOf<String>()
+    var inSegment = false
+
+    for (line in lines) {
+        if (line.startsWith("## ")) {
+            if (inSegment) break  // next segment started, stop reading
+            inSegment = true
+        }
+        if (inSegment) {
+            changelogLines += line
+        }
+    }
+
+    return changelogLines.joinToString("\n").trim()
+}
+
+tasks.register("viewLatestChangelog") {
+    group = "documentation"
+    description = "Print the topmost single version section from the full CHANGELOG.md file."
+
+    doLast {
+        println(getLatestChangelog())
     }
 }

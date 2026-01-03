@@ -53,12 +53,6 @@ dependencies {
 }
 
 tasks.named<RemapJarTask>("remapJar") {
-    dependsOn(tasks.shadowJar)
-
     inputFile.set(tasks.shadowJar.get().archiveFile)
     archiveFileName = "${base.archivesName.get()}.jar"
-}
-
-tasks.build {
-    dependsOn(tasks.named("remapJar"))
 }

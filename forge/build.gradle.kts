@@ -10,9 +10,16 @@ architectury {
     forge()
 }
 
+val modId: String = property("mod_id") as String
 val minecraftVersion: String = property("minecraft_version") as String
 val forgeVersion: String = property("forge_version") as String
 val architecturyVersion: String = property("architectury_version") as String
+
+loom {
+    forge {
+        mixinConfig("${modId}.mixins.json")
+    }
+}
 
 val common: Configuration by configurations.creating {
     isCanBeResolved = true
@@ -54,12 +61,6 @@ dependencies {
 }
 
 tasks.named<RemapJarTask>("remapJar") {
-    dependsOn(tasks.shadowJar)
-
     inputFile.set(tasks.shadowJar.get().archiveFile)
     archiveFileName = "${base.archivesName.get()}.jar"
-}
-
-tasks.build {
-    dependsOn(tasks.named("remapJar"))
 }

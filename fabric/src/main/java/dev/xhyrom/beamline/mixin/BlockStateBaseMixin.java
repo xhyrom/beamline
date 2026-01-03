@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.BlockHitResult;
 
 @Mixin(BlockBehaviour.BlockStateBase.class)
-public class BlockBehaviourBlockStateBaseMixin {
+public abstract class BlockStateBaseMixin {
     @Inject(at = @At("HEAD"), method = "use", cancellable = true)
     private void use(Level level, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir) {
         Item held = player.getItemInHand(interactionHand).getItem();

@@ -6,7 +6,7 @@
   "client": [],
   "mixins": [
     "DisplayLinkBlockMixin",
-    "BlockBehaviourBlockStateBaseMixin"
+    "BlockStateBaseMixin"
   ],
   "injectors": {
     "defaultRequire": 1
