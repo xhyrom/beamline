@@ -51,7 +51,7 @@ subprojects {
     }
 
     base {
-        archivesName.set("${baseName}_${name}-${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}")
+        archivesName.set("${baseName}_${name}-${modVersion}+${if (name == "forge") "fg" else "fb"}_mc-${supportedMinecraftVersions}-cr-${supportedCreateVersions}")
     }
 
     tasks.processResources {
@@ -101,7 +101,7 @@ publishMods {
 
     val cfOptions = curseforgeOptions {
         accessToken.set(curseforgeToken)
-        projectId.set("1419347")
+        projectId.set("1419839")
         minecraftVersions.add(supportedMinecraftVersions)
     }
 
@@ -121,7 +121,7 @@ publishMods {
         }.flatMap { it }
 
         file.set(remapJarProvider)
-        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} $modVersion for Minecraft $supportedMinecraftVersions and Create $supportedCreateVersions"
 
         modLoaders.add("forge")
 
@@ -139,7 +139,7 @@ publishMods {
         }.flatMap { it }
 
         file.set(remapJarProvider)
-        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} $modVersion for Minecraft $supportedMinecraftVersions and Create $supportedCreateVersions"
 
         modLoaders.add("fabric")
         modLoaders.add("quilt")
@@ -159,7 +159,7 @@ publishMods {
         }.flatMap { it }
 
         file.set(remapJarProvider)
-        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} $modVersion for Minecraft $supportedMinecraftVersions and Create $supportedCreateVersions"
 
         modLoaders.add("fabric")
         modLoaders.add("quilt")
@@ -179,7 +179,7 @@ publishMods {
         }.flatMap { it }
 
         file.set(remapJarProvider)
-        displayName = "Beamline ${proj.name.uppercaseFirstChar()} ${modVersion}+mc-${supportedMinecraftVersions}-create-${supportedCreateVersions}"
+        displayName = "Beamline ${proj.name.uppercaseFirstChar()} $modVersion for Minecraft $supportedMinecraftVersions and Create $supportedCreateVersions"
 
         modLoaders.add("forge")
 
