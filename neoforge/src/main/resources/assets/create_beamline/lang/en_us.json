@@ -2,7 +2,6 @@
   "block.create_beamline.smart_display_link": "Smart Display Link",
   "itemGroup.create_beamline": "Create: Beamline",
   "create_beamline.screen.smart_display_link.title": "Display Link",
-  "create_beamline.screen.smart_display_link.back_to_selection": "Back to Selection",
   "create_beamline.screen.smart_display_link.name_tooltip.title": "Name for this Display Link",
   "create_beamline.screen.smart_display_link.name_tooltip.display": "The name shown in Smart Display Link's selection",
   "create_beamline.screen.smart_display_link_selection.title": "Select Display Link",

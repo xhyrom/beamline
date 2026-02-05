@@ -61,7 +61,6 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
     private final int connectionIndex;
 
     private IconButton confirmButton;
-    private IconButton backButton;
 
     BlockState sourceState;
     BlockState targetState;
@@ -139,11 +138,6 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
                 )
         );
         addRenderableWidget(nameInput);
-
-        backButton = new IconButton(x + background.getWidth() - 33, y + h - 48, AllIcons.I_PRIORITY_LOW);
-        backButton.withCallback(() -> ScreenOpener.open(new SmartDisplayLinkSelectionScreen(blockEntity)));
-        backButton.setToolTip(Component.translatable("create_beamline.screen.smart_display_link.back_to_selection"));
-        addRenderableWidget(backButton);
     }
 
     @Override

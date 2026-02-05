@@ -44,8 +44,6 @@ public class SmartDisplayLinkConfigurationPacket extends BlockEntityConfiguratio
         this.linkIndex = linkIndex;
         this.configData = configData;
         this.targetLine = targetLine;
-
-        System.out.println("Created SmartDisplayLinkConfigurationPacket with name: " + customName.orElse("Unnamed") + ", linkIndex: " + linkIndex + ", targetLine: " + targetLine);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.widget.IconButton;
 import dev.xhyrom.beamline.block.entity.SmartDisplayLinkBlockEntity;
+import dev.xhyrom.beamline.registry.GuiTextures;
 import net.createmod.catnip.animation.LerpedFloat;
 import net.createmod.catnip.animation.LerpedFloat.Chaser;
 import net.createmod.catnip.gui.AbstractSimiScreen;
@@ -30,13 +31,13 @@ public class SmartDisplayLinkSelectionScreen extends AbstractSimiScreen {
     private static final int CARD_WIDTH = 195;
 
     private final SmartDisplayLinkBlockEntity be;
-    private final AllGuiTextures background;
+    private final GuiTextures background;
 
     private final LerpedFloat scroll = LerpedFloat.linear().startWithValue(0);
 
     public SmartDisplayLinkSelectionScreen(SmartDisplayLinkBlockEntity be) {
         this.be = be;
-        this.background = AllGuiTextures.SCHEDULE;
+        this.background = GuiTextures.DISPLAY_LINK_SELECTION;
     }
 
     @Override
