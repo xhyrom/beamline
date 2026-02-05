@@ -1,0 +1,20 @@
+{
+  "block.create_beamline.smart_display_link": "Enlace de pantalla inteligente",
+  "itemGroup.create_beamline": "Create: Beamline",
+  "create_beamline.screen.smart_display_link.title": "Enlace de pantalla",
+  "create_beamline.screen.smart_display_link.name_tooltip.title": "Nombre para este Enlace de pantalla",
+  "create_beamline.screen.smart_display_link.name_tooltip.display": "El nombre mostrado en la selección del Enlace de pantalla inteligente",
+  "create_beamline.screen.smart_display_link_selection.title": "Seleccionar Enlace de pantalla",
+  "create_beamline.screen.smart_display_link_selection.no_links": "No hay objetivos vinculados",
+
+  "create_beamline.smart_display_link.clear": "Selección de posición borrada",
+  "create_beamline.smart_display_link.set": "Posición objetivo seleccionada",
+  "create_beamline.smart_display_link.invalid": "El enlace no tiene un objetivo válido, intenta colocarlo de nuevo",
+  "create_beamline.smart_display_link.dimension_mismatch": "La posición objetivo está en una dimensión diferente",
+  "create_beamline.smart_display_link.already_selected": "Este objetivo ya está seleccionado",
+  "create_beamline.smart_display_link.too_far": "La posición objetivo está demasiado lejos de aquí",
+  "create_beamline.smart_display_link.success": "Vinculado con éxito a la posición objetivo",
+  "create_beamline.smart_display_link.added_sources": "Se añadieron con éxito %s nuevos objetivos",
+  "create_beamline.smart_display_link.no_new_sources": "Todos los objetivos seleccionados ya están vinculados",
+  "create_beamline.smart_display_link.no_selections": "Nada seleccionado para añadir como objetivos"
+}
