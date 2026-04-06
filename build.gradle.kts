@@ -22,6 +22,12 @@ val modDescription: String = property("mod_description") as String
 version = modVersion
 group = "dev.xhyrom"
 
+allprojects {
+    repositories {
+        maven("https://libraries.minecraft.net") // fixes issue with lwjgl-freetype not being found on macos
+    }
+}
+
 subprojects {
     apply(plugin = "java")
     apply(plugin = "com.github.johnrengelman.shadow")

@@ -29,11 +29,11 @@ repositories {
 dependencies {
     compileOnly("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
-    implementation("com.simibubi.create:create-${minecraftVersion}:${property("create_neoforge_version")}:slim") { isTransitive = false }
-    implementation("net.createmod.ponder:ponder-neoforge:${property("ponder_version")}")
+    compileOnly("com.simibubi.create:create-${minecraftVersion}:${property("create_neoforge_version")}:slim") { isTransitive = false }
+    compileOnly("net.createmod.ponder:ponder-neoforge:${property("ponder_version")}")
     compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraftVersion}:${property("flywheel_version")}")
-    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraftVersion}:${property("flywheel_version")}")
-    implementation("com.tterrag.registrate:Registrate:${property("registrate_version")}")
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraftVersion}:${property("flywheel_version")}")
+    compileOnly("com.tterrag.registrate:Registrate:${property("registrate_version")}")
 }
 
 tasks.shadowJar {
