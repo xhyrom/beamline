@@ -48,6 +48,11 @@ public class SmartDisplayLinkConfigurationPacket extends BlockEntityConfiguratio
 
     @Override
     protected void applySettings(ServerPlayer player, SmartDisplayLinkBlockEntity be) {
+        final SmartDisplayLinkBlockEntity.LinkConnection connection = be.connections.get(linkIndex);
+
+        connection.targetLine(targetLine);
+        customName.ifPresent(connection::name);
+
         if (!configData.contains("Id")) {
             be.notifyUpdate();
             return;
@@ -60,11 +65,6 @@ public class SmartDisplayLinkConfigurationPacket extends BlockEntityConfiguratio
             be.notifyUpdate();
             return;
         }
-
-        final SmartDisplayLinkBlockEntity.LinkConnection connection = be.connections.get(linkIndex);
-
-        connection.targetLine(targetLine);
-        customName.ifPresent(connection::name);
 
         if (connection.source() == null || connection.source() != source) {
             connection.source(source);
