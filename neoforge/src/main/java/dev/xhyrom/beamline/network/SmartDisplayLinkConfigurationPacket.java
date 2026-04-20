@@ -63,6 +63,7 @@ public class SmartDisplayLinkConfigurationPacket extends BlockEntityConfiguratio
 
         final SmartDisplayLinkBlockEntity.LinkConnection connection = be.connections.get(linkIndex);
 
+        connection.targetLine(targetLine);
         customName.ifPresent(connection::name);
 
         if (connection.source() == null || connection.source() != source) {
