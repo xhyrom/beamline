@@ -75,7 +75,6 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
 
     private IconButton confirmButton;
     private IconButton createidlxPlaceholdersGuideButton;
-    private IconButton createidlxClipboardGuideButton;
 
     BlockState sourceState;
     BlockState targetState;
@@ -466,37 +465,20 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
             return;
 
         ScreenElement placeholdersIcon = getCreateIDLXIcon("placeholdersIcon");
-        ScreenElement clipboardIcon = getCreateIDLXIcon("clipboardIcon");
-        if (placeholdersIcon == null || clipboardIcon == null)
+        if (placeholdersIcon == null)
             return;
 
         createidlxPlaceholdersGuideButton = new IconButton(guiLeft + 36, guiTop + 46, 16, 16, placeholdersIcon);
         createidlxPlaceholdersGuideButton.withCallback((mX, mY) -> openCreateIDLXPonder(2));
         refreshCreateIDLXPlaceholdersTooltip();
 
-        createidlxClipboardGuideButton = new IconButton(guiLeft + 36, guiTop + 67, 16, 16, clipboardIcon);
-        createidlxClipboardGuideButton.withCallback((mX, mY) -> openCreateIDLXPonder(3));
-        createidlxClipboardGuideButton.getToolTip().addAll(List.of(
-                createidlxComponent("gui.display_link.clipboard_tooltip_header").withStyle(s -> s.withColor(0x5391E1)),
-                createidlxComponent("gui.display_link.clipboard_tooltip_1").withStyle(ChatFormatting.GRAY),
-                createidlxComponent("gui.display_link.clipboard_tooltip_2").withStyle(ChatFormatting.GRAY),
-                createidlxComponent("gui.display_link.clipboard_tooltip_3").withStyle(ChatFormatting.GRAY),
-                createidlxComponent("gui.generic.click_to_ponder").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
-        ));
-
         addRenderableWidget(createidlxPlaceholdersGuideButton);
-        addRenderableWidget(createidlxClipboardGuideButton);
     }
 
     private void removeCreateIDLXGuideButtons() {
         if (createidlxPlaceholdersGuideButton != null) {
             removeWidget(createidlxPlaceholdersGuideButton);
             createidlxPlaceholdersGuideButton = null;
-        }
-
-        if (createidlxClipboardGuideButton != null) {
-            removeWidget(createidlxClipboardGuideButton);
-            createidlxClipboardGuideButton = null;
         }
     }
 
