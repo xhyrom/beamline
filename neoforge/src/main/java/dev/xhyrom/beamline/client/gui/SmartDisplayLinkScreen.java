@@ -1,6 +1,8 @@
 package dev.xhyrom.beamline.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.AllKeys;
 import com.simibubi.create.api.behaviour.display.DisplaySource;
 import com.simibubi.create.api.behaviour.display.DisplayTarget;
 import com.simibubi.create.api.registry.CreateBuiltInRegistries;
@@ -27,6 +29,7 @@ import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.createmod.catnip.gui.ScreenOpener;
 import net.createmod.catnip.gui.UIRenderHelper;
 import net.createmod.catnip.gui.element.GuiGameElement;
+import net.createmod.catnip.gui.element.ScreenElement;
 import net.createmod.catnip.gui.widget.AbstractSimiWidget;
 import net.createmod.catnip.gui.widget.ElementWidget;
 import net.createmod.catnip.platform.CatnipServices;
@@ -47,20 +50,31 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class SmartDisplayLinkScreen extends AbstractSimiScreen {
     private static final ItemStack FALLBACK = new ItemStack(Items.BARRIER);
+    private static final String CREATE_IDLX = "createidlx";
+    private static final boolean CREATE_IDLX_LOADED = ModList.get().isLoaded(CREATE_IDLX);
+    private static final Method CREATE_IDLX_ENTER_SOURCE_CONFIG = findCreateIDLXMethod("com.vladiscrafter.createidlx.util.gui.CreateIDLXGuiContext", "enter", DisplaySource.class);
+    private static final Method CREATE_IDLX_EXIT_SOURCE_CONFIG = findCreateIDLXMethod("com.vladiscrafter.createidlx.util.gui.CreateIDLXGuiContext", "exit");
+    private static final Constructor<?> CREATE_IDLX_IN_BOUNDS_SELECTOR = findCreateIDLXConstructor(
+            "com.vladiscrafter.createidlx.util.widget.InBoundsSelectionScrollInput",
+            int.class, int.class, int.class, int.class, boolean.class, boolean.class);
 
     private final AllGuiTextures background;
     private final SmartDisplayLinkBlockEntity blockEntity;
     private final int connectionIndex;
 
     private IconButton confirmButton;
+    private IconButton createidlxPlaceholdersGuideButton;
 
     BlockState sourceState;
     BlockState targetState;
@@ -247,11 +261,13 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
             sourceTypeLabel = new Label(x + 65, y + 30, CommonComponents.EMPTY).withShadow();
             sourceTypeLabel.text = sources.get(startIndex).getName();
 
+            boolean useEnhancedSelector = hasCreateIDLXEnhancedSelectors();
+            List<Component> options = sources.stream()
+                    .map(DisplaySource::getName)
+                    .toList();
+
             if (sources.size() > 1) {
-                List<Component> options = sources.stream()
-                        .map(DisplaySource::getName)
-                        .toList();
-                sourceTypeSelector = new SelectionScrollInput(x + 61, y + 26, 135, 16).forOptions(options)
+                sourceTypeSelector = createSourceTypeSelector(x + 61, y + 26, 135, 16, false).forOptions(options)
                         .writingTo(sourceTypeLabel)
                         .titled(CreateLang.translateDirect("display_link.information_type"))
                         .calling(this::initGathererSourceSubOptions)
@@ -259,10 +275,19 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
                 sourceTypeSelector.onChanged();
                 addRenderableWidget(sourceTypeSelector);
             } else {
+                if (useEnhancedSelector) {
+                    sourceTypeSelector = createSourceTypeSelector(x + 61, y + 26, 135, 16, true).forOptions(options)
+                            .writingTo(sourceTypeLabel)
+                            .titled(CreateLang.translateDirect("display_link.information_type"))
+                            .calling(this::initGathererSourceSubOptions)
+                            .setState(0);
+                    addRenderableWidget(sourceTypeSelector);
+                }
                 initGathererSourceSubOptions(0);
             }
 
-            addRenderableWidget(sourceTypeLabel);
+            if (!useEnhancedSelector)
+                addRenderableWidget(sourceTypeLabel);
         }
     }
 
@@ -282,10 +307,16 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
 
         DisplayLinkContext context = new SmartDisplayLinkContext(minecraft.level, blockEntity, getConnection());
 
-        configWidgets.forEachWithContext((s, first) -> source.initConfigurationWidgets(context,
-                new ModularGuiLineBuilder(font, s, guiLeft + 60, guiTop + (first ? 51 : 72)), first));
+        enterCreateIDLXSourceConfig(source);
+        try {
+            configWidgets.forEachWithContext((s, first) -> source.initConfigurationWidgets(context,
+                    new ModularGuiLineBuilder(font, s, guiLeft + 60, guiTop + (first ? 51 : 72)), first));
+        } finally {
+            exitCreateIDLXSourceConfig();
+        }
 
         configWidgets.forEach(s -> s.loadValues(getCurrentSourceConfig(), this::addRenderableWidget, this::addRenderableOnly));
+        initCreateIDLXGuideButtons(source);
     }
 
     public void onConfirm() {
@@ -341,6 +372,8 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
         if (target == null)
             graphics.drawString(font, CreateLang.translateDirect("display_link.no_target"), x + 65, y + 109, 0xD3D3D3);
 
+        refreshCreateIDLXPlaceholdersTooltip();
+
         PoseStack ms = graphics.pose();
 
         ms.pushPose();
@@ -365,5 +398,138 @@ public class SmartDisplayLinkScreen extends AbstractSimiScreen {
                         .setValue(SmartDisplayLinkBlock.FACING, Direction.UP))
                 .render(graphics);
         ms.popPose();
+    }
+
+    private static boolean hasCreateIDLXEnhancedSelectors() {
+        return CREATE_IDLX_LOADED && CREATE_IDLX_IN_BOUNDS_SELECTOR != null;
+    }
+
+    private static SelectionScrollInput createSourceTypeSelector(int x, int y, int width, int height, boolean singleOption) {
+        if (hasCreateIDLXEnhancedSelectors()) {
+            try {
+                return (SelectionScrollInput) CREATE_IDLX_IN_BOUNDS_SELECTOR
+                        .newInstance(x, y, width, height, true, singleOption);
+            } catch (ReflectiveOperationException ignored) {
+            }
+        }
+
+        return new SelectionScrollInput(x, y, width, height);
+    }
+
+    private static void enterCreateIDLXSourceConfig(DisplaySource source) {
+        if (!CREATE_IDLX_LOADED || CREATE_IDLX_ENTER_SOURCE_CONFIG == null)
+            return;
+
+        try {
+            CREATE_IDLX_ENTER_SOURCE_CONFIG.invoke(null, source);
+        } catch (ReflectiveOperationException ignored) {
+        }
+    }
+
+    private static void exitCreateIDLXSourceConfig() {
+        if (!CREATE_IDLX_LOADED || CREATE_IDLX_EXIT_SOURCE_CONFIG == null)
+            return;
+
+        try {
+            CREATE_IDLX_EXIT_SOURCE_CONFIG.invoke(null);
+        } catch (ReflectiveOperationException ignored) {
+        }
+    }
+
+    private static Method findCreateIDLXMethod(String className, String methodName, Class<?>... parameters) {
+        if (!CREATE_IDLX_LOADED)
+            return null;
+
+        try {
+            return Class.forName(className).getMethod(methodName, parameters);
+        } catch (ReflectiveOperationException ignored) {
+            return null;
+        }
+    }
+
+    private static Constructor<?> findCreateIDLXConstructor(String className, Class<?>... parameters) {
+        if (!CREATE_IDLX_LOADED)
+            return null;
+
+        try {
+            return Class.forName(className).getConstructor(parameters);
+        } catch (ReflectiveOperationException ignored) {
+            return null;
+        }
+    }
+
+    private void initCreateIDLXGuideButtons(DisplaySource source) {
+        removeCreateIDLXGuideButtons();
+
+        if (!CREATE_IDLX_LOADED || !(source instanceof SingleLineDisplaySource))
+            return;
+
+        ScreenElement placeholdersIcon = getCreateIDLXIcon("placeholdersIcon");
+        if (placeholdersIcon == null)
+            return;
+
+        createidlxPlaceholdersGuideButton = new IconButton(guiLeft + 36, guiTop + 46, 16, 16, placeholdersIcon);
+        createidlxPlaceholdersGuideButton.withCallback((mX, mY) -> openCreateIDLXPonder(2));
+        refreshCreateIDLXPlaceholdersTooltip();
+
+        addRenderableWidget(createidlxPlaceholdersGuideButton);
+    }
+
+    private void removeCreateIDLXGuideButtons() {
+        if (createidlxPlaceholdersGuideButton != null) {
+            removeWidget(createidlxPlaceholdersGuideButton);
+            createidlxPlaceholdersGuideButton = null;
+        }
+    }
+
+    private void refreshCreateIDLXPlaceholdersTooltip() {
+        if (createidlxPlaceholdersGuideButton == null)
+            return;
+
+        if (AllKeys.shiftDown()) {
+            createidlxPlaceholdersGuideButton.setToolTip(createidlxComponent("gui.display_link.placeholders_tooltip_detailed_header").withColor(0x5391E1));
+            createidlxPlaceholdersGuideButton.getToolTip().addAll(List.of(
+                    createidlxComponent("gui.display_link.placeholders_tooltip_1").withStyle(ChatFormatting.GRAY),
+                    createidlxComponent("gui.display_link.placeholders_tooltip_2").withStyle(ChatFormatting.GRAY),
+                    createidlxComponent("gui.display_link.placeholders_tooltip_3").withStyle(ChatFormatting.GRAY)
+            ));
+        } else {
+            createidlxPlaceholdersGuideButton.setToolTip(createidlxComponent("gui.display_link.placeholders_tooltip_header").withColor(0x5391E1));
+            createidlxPlaceholdersGuideButton.getToolTip().addAll(List.of(
+                    createidlxComponent("gui.display_link.placeholders_tooltip_1").withStyle(ChatFormatting.GRAY),
+                    createidlxComponent("gui.display_link.placeholders_tooltip_2").withStyle(ChatFormatting.GRAY),
+                    createidlxComponent("gui.display_link.placeholders_tooltip_3").withStyle(ChatFormatting.GRAY),
+                    createidlxComponent("gui.display_link.placeholders_tooltip_hint").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
+            ));
+        }
+
+        createidlxPlaceholdersGuideButton.getToolTip().add(createidlxComponent("gui.generic.click_to_ponder").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+    }
+
+    private static MutableComponent createidlxComponent(String key) {
+        return Component.translatable(CREATE_IDLX + "." + key);
+    }
+
+    private static ScreenElement getCreateIDLXIcon(String fieldName) {
+        try {
+            Object icon = Class.forName("com.vladiscrafter.createidlx.foundation.gui.CreateIDLXIcons")
+                    .getField(fieldName)
+                    .get(null);
+            return icon instanceof ScreenElement screenElement ? screenElement : null;
+        } catch (ReflectiveOperationException ignored) {
+            return null;
+        }
+    }
+
+    private void openCreateIDLXPonder(int sceneIndex) {
+        onConfirm(false);
+
+        try {
+            Class.forName("com.vladiscrafter.createidlx.util.ponder.PonderSceneOpener")
+                    .getMethod("openByIndex", ItemStack.class, int.class)
+                    .invoke(null, AllBlocks.DISPLAY_LINK.asStack(), sceneIndex);
+        } catch (ReflectiveOperationException ignored) {
+            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_SOURCES));
+        }
     }
 }
