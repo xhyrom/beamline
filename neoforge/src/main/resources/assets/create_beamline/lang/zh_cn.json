@@ -1,0 +1,20 @@
+{
+  "block.create_beamline.smart_display_link": "智能显示链接器",
+  "itemGroup.create_beamline": "机械动力：智能显示",
+  "create_beamline.screen.smart_display_link.title": "显示链接器",
+  "create_beamline.screen.smart_display_link.name_tooltip.title": "显示链接器名称",
+  "create_beamline.screen.smart_display_link.name_tooltip.display": "在智能显示链接器列表中显示的名称",
+  "create_beamline.screen.smart_display_link_selection.title": "选择显示链接器",
+  "create_beamline.screen.smart_display_link_selection.no_links": "未链接任何目标",
+
+  "create_beamline.smart_display_link.clear": "已清除选中的位置",
+  "create_beamline.smart_display_link.set": "已选中目标位置",
+  "create_beamline.smart_display_link.invalid": "链接器未指向有效目标，请尝试重新放置",
+  "create_beamline.smart_display_link.dimension_mismatch": "目标位置位于其他维度",
+  "create_beamline.smart_display_link.already_selected": "该目标已被选中",
+  "create_beamline.smart_display_link.too_far": "目标位置距离过远",
+  "create_beamline.smart_display_link.success": "已成功绑定至目标位置",
+  "create_beamline.smart_display_link.added_sources": "已成功添加 %s 个新目标",
+  "create_beamline.smart_display_link.no_new_sources": "所有选中的目标均已链接",
+  "create_beamline.smart_display_link.no_selections": "未选中任何目标"
+}
